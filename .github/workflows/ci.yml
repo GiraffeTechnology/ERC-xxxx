@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Compile
+        run: npm run compile
+
+      - name: Check frozen ERC constants (interface IDs)
+        run: npm run verify:constants
+
+      - name: Check publication boundaries
+        run: npm run verify:secret-scan
+
+      - name: Check import boundaries
+        run: npm run verify:imports
+
+      - name: Test
+        run: npm run test
+
+      - name: Build
+        run: npm run build
