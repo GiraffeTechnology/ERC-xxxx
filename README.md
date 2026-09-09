@@ -9,39 +9,25 @@ This repository contains a public Ethereum ERC working draft for **Asynchronous 
 
 This repository is a standards proposal repository. It is not a product repository and does not represent an adopted Ethereum standard.
 
----
-
 ## Overview
 
-Tokenized assets may depend on external registries, including ownership records, custody records, certification systems, and other institutional databases.
+Tokenized assets may depend on external registries, including ownership records, custody records, certification systems, and institutional databases.
 
-These external registries and blockchain networks do not necessarily update at the same time.
+External registries and blockchain networks do not necessarily update at the same time.
 
-An ERC-721 token can represent a transferable on-chain position, but:
-
-```
-ownerOf(tokenId)
-```
-
-only answers the current blockchain ownership state.
-
-It does not answer:
+An ERC-721 token represents a tradeable on-chain position. However, `ownerOf(tokenId)` does not answer:
 
 - which holder an external registry recognized at a particular record instant;
 - whether that historical answer is final;
 - whether an unresolved registry transition exists.
 
-This proposal introduces a standard interface for representing externally maintained registry states and their temporal evolution alongside ERC-721 compatible assets.
-
----
+This proposal defines a standard interface for representing externally maintained registry states and their temporal evolution alongside ERC-721 compatible assets.
 
 ## Design Principles
 
-The proposal is based on three principles:
-
 ### 1. Separate Token State and Registry State
 
-The token ownership state and external registry-confirmed state are related but distinct.
+The proposal keeps two states distinct:
 
 ```
 Tradeable Token Position
@@ -49,87 +35,32 @@ Tradeable Token Position
 Registry-confirmed Historical State
 ```
 
-### 2. Do Not Freeze Token Transfers
+The token remains transferable while registry synchronization occurs.
 
-Registry updates may arrive asynchronously.
+### 2. Preserve External Registry Boundaries
 
-A pending registry update should not require freezing normal ERC-721 transfers.
-
-The unresolved state should be represented explicitly through projection semantics.
-
-### 3. Preserve External Registry Boundaries
-
-This proposal does not move external registries on-chain and does not attempt to replace legal or institutional sources of truth.
+This proposal does not move external registries on-chain and does not replace legal or institutional sources of truth.
 
 It provides a verifiable interoperability layer between external registries and blockchain assets.
 
----
+### 3. Historical Semantics Must Be Explicit
 
-## Core Concepts
+The proposal separates:
 
-### Registry Projection
-
-External registry changes are represented as ordered projection entries.
-
-Each entry contains:
-
-- holder address;
-- effective time;
-- record commitment;
-- previous commitment;
-- registry reference;
-- version.
-
-Projection entries are append-only.
-
-Required invariants:
-
-- versions are consecutive;
-- effective times strictly increase;
-- record commitments cannot repeat within a token history;
-- existing entries cannot be overwritten, deleted, reordered, or skipped.
-
----
-
-## Historical Query Semantics
-
-The proposal introduces:
-
-### `holderAsOf(t)`
-
-Returns the holder recorded by the projected registry at a specified instant.
-
-### `isFinalAsOf(t)`
-
-Determines whether future registry admissions can change that historical result.
-
-### `openGapOf(t)`
-
-Indicates whether a registry transition affecting that instant remains unresolved.
-
-These are intentionally separate concepts.
-
----
+- historical resolution (`holderAsOf`);
+- finality determination (`isFinalAsOf`);
+- unresolved transitions (`openGapOf`).
 
 ## Relationship with Existing Standards
 
-### ERC-721
+| Standard | Primary Scope |
+| --- | --- |
+| ERC-721 | NFT representation and current on-chain ownership |
+| ERC-1400 | Security token transfer and compliance controls |
+| ERC-3643 | Permissioned token compliance |
+| This Proposal | External registry temporal projection |
 
-Provides NFT representation and current on-chain ownership.
-
-### ERC-1400 / ERC-3643
-
-Provide compliance-oriented ownership restrictions and permissioned transfer mechanisms.
-
-### This Proposal
-
-Addresses a different problem:
-
-> How should external registry states and their historical evolution be represented when they update asynchronously relative to blockchain state?
-
-The proposal is complementary to existing token standards.
-
----
+This proposal is complementary to existing token standards.
 
 ## Scope and Non-Goals
 
@@ -143,25 +74,19 @@ This proposal does not:
 
 A proof establishes inclusion in an accepted remote state. It does not independently prove the factual correctness of the underlying registry.
 
----
-
 ## Repository Structure
 
 ```
 ERC9999/
 ├── EIPS/
-│   └── eip-9999.md              Specification draft
 ├── interfaces/
-│   ├── IRegisterProjection.sol
-│   └── IProjectionSettlement.sol
 ├── reference/
-│   └── RegisterProjectionReference.sol
 ├── test/
-│   └── invariant tests
+├── RATIONALE.md
+├── COMPARISON.md
+├── SECURITY.md
 └── README.md
 ```
-
----
 
 ## Status
 
