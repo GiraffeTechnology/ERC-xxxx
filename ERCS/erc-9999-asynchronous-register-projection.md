@@ -57,7 +57,7 @@ A **projection gap** is an interval in which a change is known to be in progress
 
 An instant is **contested** when a projection gap is open on the token and that gap opened at or before the instant. A contract offering no settlement interface has no gaps and no contested instants.
 
-A **verification profile**, called a **profile** below, defines the remote-finality proof, light-client or validator rules, state-root commitment, membership-proof algorithm, validator-set evolution, canonical encoding and hash functions. Verification under it MUST be deterministic and domain separated. This ERC does not constrain how an attested value is produced; a profile MAY.
+A **verification profile**, called a **profile** below, defines the remote-finality proof, light-client or validator rules, state-root commitment, membership-proof algorithm, validator-set evolution, canonical encoding, and hash functions. Verification under it MUST be deterministic and domain separated. This ERC does not constrain how an attested value is produced; a profile MAY.
 
 A **settlement authority** for a token is an account that may open a gap on it, as reported by `isSettlementAuthority`. A profile MUST define the policy.
 
@@ -82,7 +82,7 @@ Entries MUST NOT be overwritten, deleted, reordered or skipped. Queries for a no
 
 Invariant 3 makes finality decidable with one comparison. Every admitted entry has an `effectiveAt` strictly greater than the latest entry's, so no entry admitted in the future can cover an instant that already precedes the latest entry's effective time.
 
-An instant is therefore final if and only if it is at or after the first entry's `effectiveAt` and strictly before the latest entry's `effectiveAt`. `isFinalAsOf` MUST return `true` exactly for those instants, MUST return `false`otherwise, and MUST NOT revert for an instant preceding the first entry.
+An instant is therefore final if and only if it is at or after the first entry's `effectiveAt` and strictly before the latest entry's `effectiveAt`. `isFinalAsOf` MUST return `true` exactly for those instants, MUST return `false` otherwise, and MUST NOT revert for an instant preceding the first entry.
 
 An instant at or after the latest entry's `effectiveAt` still resolves, but provisionally: a later admission may carry an earlier effective time and supersede the answer. A consumer that requires a settled answer MUST check `isFinalAsOf`, because `entryAsOf` does not distinguish the two cases. An open gap indicates that such an admission is expected, but finality does not depend on whether a gap is open, and closing one does not by itself make any instant final.
 
